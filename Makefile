@@ -1,8 +1,8 @@
 TARGET = px86
 BIN = helloworld.bin
 PROGRAM = $(TARGET) $(BIN)
-SRCS = main.c helloworld.asm
-OBJS = main.o
+SRCS = main.c instruction.c modrm.c emulator_function.c emulator.h emulator_function.h instruction.h modrm.h helloworld.asm
+OBJS = main.o instruction.o modrm.o emulator_function.o
 
 NASM = ../tolset_p86/tolset_p86/z_tools/nasm.exe
 LD = ld
@@ -12,7 +12,7 @@ CFLAGS = -Wall
 all : $(PROGRAM)
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $<
+	$(CC) -o $@ $^
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $<
