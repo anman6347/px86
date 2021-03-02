@@ -3,26 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "emulator.h"
+#include "emulator_function.h"
+#include "instruction.h"
+
 #define MEMORY_SIZE (1024 * 1024)
 
-enum Register { EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI, REGISTERS_COUNT };
 const char *registers_name[] = {"EAX", "ECX", "EDX", "EBX",
                                 "ESP", "EBP", "ESI", "EDI"};
 
-typedef struct {
-    /* 汎用レジスタ 8 個*/
-    uint32_t registers[REGISTERS_COUNT];
-
-    /* EFLAGSレジスタ */
-    uint32_t eflags;
-
-    /* メモリ（バイト列） */
-    uint8_t *memory;
-
-    /* プログラムカウンタ */
-    uint32_t eip;
-
-} Emulator;
 
 /* エミュレータを作成 */
 static Emulator *create_emu(size_t size, uint32_t eip, uint32_t esp) {
@@ -55,74 +44,6 @@ static void dump_registers(Emulator *emu) {
         printf("%s = %08x\n", registers_name[i], emu->registers[i]);
     }
     printf("EIP = %08x\n", emu->eip);
-}
-
-/* memory 配列の eip が指す番地から 8 ビットの符号無し整数値を取得し、32
- * ビットで返す。第 2 引数で eip からのオフセットを指定できる */
-uint32_t get_code8(Emulator *emu, int index) {
-    return emu->memory[emu->eip + index];
-}
-
-/* memory 配列の eip が指す番地から 8 ビットの符号付き整数値を取得し、32
- * ビットで返す。第 2 引数で eip からのオフセットを指定できる */
-int32_t get_sign_code8(Emulator *emu, int index) {
-    return (int8_t)emu->memory[emu->eip + index];
-}
-
-/* memory 配列の eip が指す番地から 32 ビットの符号無し整数値を取得し、32
- * ビットで返す。第 2 引数で eip からのオフセットを指定できる */
-uint32_t get_code32(Emulator *emu, int index) {
-    int i;
-    uint32_t ret = 0;
-
-    /* リトルエンディアンでメモリの値を取得する */
-    for(i = 0; i < 4; i++) {
-        ret |= get_code8(emu, index + i) << (i * 8);  // 8 ビット分左にずらす
-    }
-    return ret;
-}
-
-/* memory 配列の eip が指す番地から 32 ビットの符号付き整数値を取得し、32
- * ビットで返す。第 2 引数で eip からのオフセットを指定できる */
-int32_t get_sign_code32(Emulator *emu, int index) {
-    return (int32_t)get_code32(emu, index);
-}
-
-/* 汎用レジスタに 32 ビットの即値をコピー */
-void mov_r32_imm32(Emulator *emu) {
-    uint8_t reg = get_code8(emu, 0) - 0xB8;  //レジスタの番号取得
-    uint32_t value = get_code32(emu, 1);     //代入する値を取得
-    emu->registers[reg] = value;
-    emu->eip += 5;
-}
-
-/* 1 バイトの符号付き整数値を読み取り、次の命令の番地を基点としてジャンプする */
-void short_jump(Emulator *emu) {
-    int8_t diff = get_sign_code8(emu, 1);
-    emu->eip += (diff + 2);
-}
-
-/* 4 バイトの符号付き整数値を読み取り、次の命令の番地を基点としてジャンプする */
-void near_jump(Emulator *emu) {
-    int32_t diff = get_sign_code32(emu, 1);
-    emu->eip += (diff + 5);
-}
-
-/* 関数ポインタテーブルの作成とその初期化 */
-typedef void instruction_func_t(Emulator *);
-instruction_func_t *instructions[256];
-void init_instructions() {
-    int i;
-    /* すべてのアドレスを 0 で初期化 */
-    memset(instructions, 0, sizeof(instructions));
-
-    /* 0xB8 から 8 つを mov_r32_imm32 に、0xE9 を near_jump に、0xEB を
-     * short_jump に */
-    for(i = 0; i < 8; i++) {
-        instructions[0xB8 + i] = mov_r32_imm32;
-    }
-    instructions[0xE9] = near_jump;
-    instructions[0xEB] = short_jump;
 }
 
 int main(int argc, char *argv[]) {
