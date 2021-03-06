@@ -39,4 +39,10 @@ uint32_t get_memory32(Emulator *emu, uint32_t address);
 /* メモリの index 番地に 32bit 値を設定する */
 void set_memory32(Emulator *emu, uint32_t address, uint32_t value);
 
+/* スタックに32bit値を積む */
+void push32(Emulator* emu, uint32_t value);
+
+/* スタックから32bit値を取りだす */
+uint32_t pop32(Emulator* emu);
+
 #endif
