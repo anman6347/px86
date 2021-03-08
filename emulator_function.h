@@ -23,10 +23,16 @@ uint32_t get_code32(Emulator *emu, int index);
 /* memory 配列の eip が指す番地から 32bit の符号付き整数値を取得し、32bit で返す。第 2 引数で eip からのオフセットを指定できる */
 int32_t get_sign_code32(Emulator *emu, int index);
 
-/* index 番目の汎用レジスタに 32bit 値を取得する */
+/* index 番目の 8bit 汎用レジスタの値を取得する */
+uint8_t get_register8(Emulator *emu, int index);
+
+/* index 番目の 8bit 汎用レジスタに値を設定する */
+void set_register8(Emulator *emu, int index, uint8_t value);
+
+/* index 番目の 32bit 汎用レジスタの値を取得する */
 uint32_t get_register32(Emulator *emu, int index);
 
-/* index 番目の汎用レジスタに 32bit 値を設定する */
+/* index 番目の 32bit 汎用レジスタに値を設定する */
 void set_register32(Emulator *emu, int index, uint32_t value);
 
 /* メモリの index 番地の 8bit 値を取得する */

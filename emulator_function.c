@@ -23,6 +23,24 @@ int32_t get_sign_code32(Emulator *emu, int index) {
     return (int32_t)get_code32(emu, index);
 }
 
+uint8_t get_register8(Emulator *emu, int index) {
+    if (index < 4) {
+        return emu->registers[index] & 0xff;  // Low
+    } else {
+        return (emu->registers[index - 4] >> 8);  // High
+    }
+}
+
+void set_register8(Emulator *emu, int index, uint8_t value) {
+    if (index < 4) {
+        uint32_t r = emu->registers[index] & 0xffffff00;  // Low を 0 にする
+        emu->registers[index] = r | (uint32_t)value;
+    } else {
+        uint32_t r = emu->registers[index - 4] & 0xffff00ff;  // High を 0にする
+        emu->registers[index - 4] = r | ((uint32_t)value << 8);
+    }
+}
+
 uint32_t get_register32(Emulator *emu, int index) {
     return emu->registers[index];
 }

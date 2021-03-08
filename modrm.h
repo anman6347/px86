@@ -37,11 +37,23 @@ uint32_t get_rm32(Emulator* emu, ModRM* modrm);
 /* rm32 のレジスタまたはメモリに 32bit 値を設定する */
 void set_rm32(Emulator* emu, ModRM* modrm, uint32_t value);
 
+/* rm8 のレジスタまたはメモリの 8bit 値を取得する */
+uint8_t get_rm8(Emulator* emu, ModRM* modrm);
+
+/* rm8 のレジスタまたはメモリに 8bit 値を設定する */
+void set_rm8(Emulator* emu, ModRM* modrm, uint8_t value);
+
 /* r32 のレジスタの 32bit 値を取得する */
 uint32_t get_r32(Emulator* emu, ModRM* modrm);
 
 /* r32 のレジスタに 32bit 値を設定する */
 void set_r32(Emulator* emu, ModRM* modrm, uint32_t value);
+
+/* r8 のレジスタの 8bit 値を取得する */
+uint8_t get_r8(Emulator* emu, ModRM* modrm);
+
+/* r8 のレジスタに 8bit 値を設定する */
+void set_r8(Emulator* emu, ModRM* modrm, uint8_t value);
 
 /* ModR/M の内容に基づき、実効アドレスを計算する */
 uint32_t calc_memory_address(Emulator* emu, ModRM* modrm);
